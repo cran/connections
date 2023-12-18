@@ -5,19 +5,32 @@
 #' @param host Name of Host of the connection
 #' @param name Connection name
 #' @param connection_id Unique ID of the connection for the current session
-#'
+#' @returns It populates the RStudio Connections pane. It returns nothing to the
+#' console or session.
 #' @examples
 #' library(DBI)
 #' con <- connection_open(RSQLite::SQLite(), path = ":dbname:")
 #' connection_view(con)
 #' connection_close(con)
 #' @export
-connection_view <- function(con, connection_code = "", host = "", name = "", connection_id = "") {
+connection_view <- function(
+    con,
+    connection_code = "",
+    host = "",
+    name = "",
+    connection_id = ""
+    ) {
   UseMethod("connection_view")
 }
 
 #' @export
-connection_view.connConnection <- function(con, connection_code = "", host = "", name = "", connection_id = NULL) {
+connection_view.connConnection <- function(
+    con,
+    connection_code = "",
+    host = "",
+    name = "",
+    connection_id = NULL
+    ) {
   connection_view(
     con = con@con,
     connection_code = connection_code,
@@ -28,7 +41,13 @@ connection_view.connConnection <- function(con, connection_code = "", host = "",
 }
 
 #' @export
-connection_view.DBIConnection <- function(con, connection_code = "", host = "", name = "", connection_id = "") {
+connection_view.DBIConnection <- function(
+    con,
+    connection_code = "",
+    host = "",
+    name = "",
+    connection_id = ""
+    ) {
   session <- conn_session_get(connection_id)
   if (is.null(session)) {
     name <- as.character(class(con))
@@ -47,15 +66,19 @@ connection_view.DBIConnection <- function(con, connection_code = "", host = "", 
     name = name,
     host = host,
     connect_script = connect_code,
-    disconnect_code = function()
-      connection_close(con, host = host),
-    object_list = function(catalog = NULL, schema = NULL, ...)
-      dbi_list_objects(catalog, schema, sch, name, type, con),
+    disconnect_code = function() {
+      connection_close(con, host = host)
+    },
+    object_list = function(catalog = NULL, schema = NULL, ...) {
+      dbi_list_objects(catalog, schema, sch, name, type, con)
+    },
     object_columns = function(catalog = NULL, schema = NULL,
-                                  table = NULL, view = NULL, ...)
-      dbi_list_columns(catalog, schema, table, view, sch, con),
-    preview_code = function(limit, table, schema, ...)
+                              table = NULL, view = NULL, ...) {
+      dbi_list_columns(catalog, schema, table, view, sch, con)
+    },
+    preview_code = function(limit, table, schema, ...) {
       dbi_preview_object(limit, table, schema, sch, con)
+    }
   )
   rscontract_open(spec_contract)
 }
